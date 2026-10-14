@@ -169,11 +169,12 @@ h1 .orange { color: var(--orange) }
 
 /* stats */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #2b231e }
-.stat { padding: 26px 24px; border-right: 1px solid #2b231e }
+.stat { padding: 36px 28px; border-right: 1px solid #2b231e }
 .stat:last-child { border-right: 0 }
-.stat b { display: block; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.07em; font-weight: 800; line-height: 1 }
-.stat b em { font-style: normal; color: var(--orange) }
-.stat span { font: .64rem var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; display: block; margin-top: 8px }
+.stat b { display: flex; align-items: baseline; gap: .05em; font-size: clamp(3.2rem, 7vw, 5rem); letter-spacing: -.07em; font-weight: 800; line-height: .95; color: var(--cream) }
+.stat b span { font: inherit; color: inherit; letter-spacing: inherit; text-transform: none; margin: 0; display: inline }
+.stat b em { font-style: normal; color: var(--orange); font-size: .72em }
+.stat > span { font: .68rem var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; display: block; margin-top: 12px }
 
 /* sections */
 .section { padding: 72px 0 }
