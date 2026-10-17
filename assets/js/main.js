@@ -6,10 +6,21 @@
 
   $('#year').textContent = new Date().getFullYear();
 
+  /* theme toggle */
+  const themeToggle = $('#themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  }
+
   /* nav */
   const nav = $('#nav'), menu = $('#menu');
-  menu.addEventListener('click', () => nav.classList.toggle('open'));
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+  if (menu) menu.addEventListener('click', () => nav.classList.toggle('open'));
+  if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
 
   /* no-GSAP safe fallback: show everything, simple filter, then stop */
   function plainFilter() {
@@ -19,14 +30,16 @@
     }));
   }
   if (!hasGSAP || reduce) {
-    $('#preloader').style.display = 'none';
+    const pre = $('#preloader'); if (pre) pre.style.display = 'none';
     $$('.stack-item').forEach(c => c.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%'); c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%') }));
     plainFilter();
     initThree(null);
+    initArcade();
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
+  if (window.Draggable) gsap.registerPlugin(Draggable);
 
   /* smooth scroll */
   const lenis = new Lenis({ duration: 1.15, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
@@ -41,14 +54,14 @@
 
   /* progress + nav behaviour */
   const prog = $('#progress'), top = $('#top');
-  ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { prog.style.transform = `scaleX(${s.progress})` } });
+  if (prog) ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { prog.style.transform = `scaleX(${s.progress})` } });
   let lastY = 0;
   lenis.on('scroll', ({ scroll }) => {
     const down = scroll > lastY && scroll > 220;
-    gsap.to(top, { yPercent: down ? -100 : 0, duration: .45, ease: 'power3.out', overwrite: true });
+    if (top) gsap.to(top, { yPercent: down ? -100 : 0, duration: .45, ease: 'power3.out', overwrite: true });
     lastY = scroll;
   });
-  ['home', 'work', 'about', 'stack', 'contact'].forEach(id => {
+  ['home', 'work', 'about', 'arcade', 'process', 'contact'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     ScrollTrigger.create({
       trigger: el, start: 'top 55%', end: 'bottom 55%',
@@ -60,11 +73,13 @@
   if (fine) {
     document.documentElement.classList.add('has-cursor');
     const dot = $('#cDot'), ring = $('#cRing');
-    const dx = gsap.quickTo(dot, 'x', { duration: .08 }), dy = gsap.quickTo(dot, 'y', { duration: .08 });
-    const rx = gsap.quickTo(ring, 'x', { duration: .35, ease: 'power3' }), ry = gsap.quickTo(ring, 'y', { duration: .35, ease: 'power3' });
-    addEventListener('pointermove', e => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY) }, { passive: true });
-    const on = (sel, cls) => $$(sel).forEach(el => { el.addEventListener('pointerenter', () => ring.classList.add(cls)); el.addEventListener('pointerleave', () => ring.classList.remove(cls)) });
-    on('a:not(.project), button', 'hover'); on('.project', 'view');
+    if (dot && ring) {
+      const dx = gsap.quickTo(dot, 'x', { duration: .08 }), dy = gsap.quickTo(dot, 'y', { duration: .08 });
+      const rx = gsap.quickTo(ring, 'x', { duration: .35, ease: 'power3' }), ry = gsap.quickTo(ring, 'y', { duration: .35, ease: 'power3' });
+      addEventListener('pointermove', e => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY) }, { passive: true });
+      const on = (sel, cls) => $$(sel).forEach(el => { el.addEventListener('pointerenter', () => ring.classList.add(cls)); el.addEventListener('pointerleave', () => ring.classList.remove(cls)) });
+      on('a:not(.project), button', 'hover'); on('.project', 'view');
+    }
   }
 
   /* magnetic */
@@ -87,12 +102,40 @@
     el.addEventListener('pointerenter', () => gsap.to(el, { z: lift, duration: .4, ease: 'power3.out' }));
     el.addEventListener('pointerleave', () => { rx(0); ry(0); gsap.to(el, { z: 0, duration: .5, ease: 'power3.out' }) });
   }
-  if (fine) { $$('.project').forEach(c => tilt(c, 9, 14)); $$('.stack-item').forEach(c => tilt(c, 16, 10)); }
+  if (fine) { 
+    $$('.project').forEach(c => tilt(c, 9, 14)); 
+    $$('.stack-item:not([data-draggable])').forEach(c => tilt(c, 16, 10)); 
+  }
   else $$('.stack-item').forEach(c => c.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%'); c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%') }));
 
+  /* draggable stack items */
+  if (window.Draggable) {
+    $$('[data-draggable]').forEach(el => {
+      Draggable.create(el, {
+        type: 'x,y',
+        bounds: '.stack-grid',
+        inertia: true,
+        onClick: function() { this.disable(); setTimeout(() => this.enable(), 100) },
+        onDragStart: function() { gsap.to(el, { scale: 1.08, duration: .2 }) },
+        onDragEnd: function() { 
+          gsap.to(el, { scale: 1, duration: .3 }); 
+          gsap.to(el, { x: 0, y: 0, duration: 1, ease: 'elastic.out(1, 0.5)', delay: 0.5 }); 
+        }
+      });
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  }
+
   /* ticker driven by scroll velocity */
-  const tween = gsap.to('#tickerTrack', { xPercent: -50, repeat: -1, duration: 26, ease: 'none' });
-  lenis.on('scroll', ({ velocity }) => { gsap.to(tween, { timeScale: 1 + Math.min(6, Math.abs(velocity) * .5), duration: .2, overwrite: true }); gsap.to(tween, { timeScale: 1, duration: 1.2, delay: .2 }) });
+  const tickerTrack = $('#tickerTrack');
+  if (tickerTrack) {
+    const tween = gsap.to(tickerTrack, { xPercent: -50, repeat: -1, duration: 26, ease: 'none' });
+    lenis.on('scroll', ({ velocity }) => { gsap.to(tween, { timeScale: 1 + Math.min(6, Math.abs(velocity) * .5), duration: .2, overwrite: true }); gsap.to(tween, { timeScale: 1, duration: 1.2, delay: .2 }) });
+  }
 
   /* reveals */
   gsap.set('[data-rv]', { y: 36, opacity: 0 });
@@ -102,12 +145,15 @@
   gsap.set('.stack-item', { y: 24, opacity: 0, scale: .9 });
   ScrollTrigger.batch('.stack-item', { start: 'top 92%', once: true, onEnter: b => gsap.to(b, { y: 0, opacity: 1, scale: 1, duration: .7, ease: 'back.out(1.6)', stagger: .05 }) });
   gsap.set('.step', { y: 24, opacity: 0 });
-  ScrollTrigger.create({
-    trigger: '.steps', start: 'top 85%', once: true, onEnter: () => {
-      gsap.to('#stepsLine', { scaleX: 1, duration: 1.4, ease: 'power3.inOut' });
-      gsap.to('.step', { y: 0, opacity: 1, duration: .8, stagger: .15, ease: 'power3.out' });
-    }
-  });
+  const stepsLine = $('#stepsLine');
+  if (stepsLine) {
+    ScrollTrigger.create({
+      trigger: '.steps', start: 'top 85%', once: true, onEnter: () => {
+        gsap.to(stepsLine, { scaleX: 1, duration: 1.4, ease: 'power3.inOut' });
+        gsap.to('.step', { y: 0, opacity: 1, duration: .8, stagger: .15, ease: 'power3.out' });
+      }
+    });
+  }
 
   /* counters */
   $$('[data-count]').forEach(el => {
@@ -131,6 +177,9 @@
   /* about 3D mini-scene */
   initAbout();
 
+  /* arcade */
+  initArcade();
+
   /* hero intro timeline, then start page */
   const state = { p: 0 };
   const heroLines = $$('h1 .ln > span');
@@ -141,45 +190,36 @@
   gsap.set('.float', { opacity: 0, y: 14 });
 
   const pre = { n: 0 };
+  const preloader = $('#preloader'), preNum = $('#preNum'), preBar = $('#preBar');
   const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  intro.to('#preBar', { scaleX: 1, duration: 1.5, ease: 'power2.inOut' }, 0)
-    .to(pre, { n: 100, duration: 1.5, ease: 'power2.inOut', onUpdate: () => $('#preNum').textContent = Math.round(pre.n) }, 0)
-    .to('#preloader', { yPercent: -100, duration: .9, ease: 'power4.inOut', onStart: () => lenis.start() }, '+=.15')
-    .to(heroLines, { yPercent: 0, duration: 1.1, stagger: .12, ease: 'power4.out' }, '-=.35')
-    .to('[data-hero="fade"]', { y: 0, opacity: 1, duration: .8, stagger: .08 }, '-=.8')
-    .to('[data-hero="stage"]', { opacity: 1, scale: 1, y: 0, duration: 1.2 }, '-=1')
-    .to('.top', { yPercent: 0, duration: .7 }, '-=.9')
-    .to('.float', { opacity: 1, y: 0, duration: .7, stagger: .12 }, '-=.6')
-    .set('#preloader', { display: 'none' });
+  if (preloader && preBar && preNum) {
+    intro.to(preBar, { scaleX: 1, duration: 1.5, ease: 'power2.inOut' }, 0)
+      .to(pre, { n: 100, duration: 1.5, ease: 'power2.inOut', onUpdate: () => preNum.textContent = Math.round(pre.n) }, 0)
+      .to(preloader, { yPercent: -100, duration: .9, ease: 'power4.inOut', onStart: () => lenis.start() }, '+=.15')
+      .to(heroLines, { yPercent: 0, duration: 1.1, stagger: .12, ease: 'power4.out' }, '-=.35')
+      .to('[data-hero="fade"]', { y: 0, opacity: 1, duration: .8, stagger: .08 }, '-=.8')
+      .to('[data-hero="stage"]', { opacity: 1, scale: 1, y: 0, duration: 1.2 }, '-=1')
+      .to('.top', { yPercent: 0, duration: .7 }, '-=.9')
+      .to('.float', { opacity: 1, y: 0, duration: .7, stagger: .12 }, '-=.6')
+      .set(preloader, { display: 'none' });
+  }
 
   /* hero scene scroll-scrub + float parallax */
-  gsap.to(state, { p: 1, ease: 'none', scrollTrigger: { trigger: '#home', start: 'top top', end: 'bottom top', scrub: true } });
+  ScrollTrigger.create({ trigger: '#home', start: 'top top', end: 'bottom top', scrub: true, onUpdate: s => state.p = s.progress });
   gsap.to('#stage', { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#home', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.hero-copy', { yPercent: -10, opacity: .35, ease: 'none', scrollTrigger: { trigger: '#home', start: 'top top', end: 'bottom top', scrub: true } });
   $$('.float').forEach((f, i) => gsap.to(f, { y: '+=10', duration: 2.6 + i * .5, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: i * .3 }));
-  gsap.to('#logoR', { rotation: 360, duration: 8, repeat: -1, ease: 'none' });
+  const logoR = $('#logoR'); if (logoR) gsap.to(logoR, { rotation: 360, duration: 8, repeat: -1, ease: 'none' });
 
   initThree(state);
   initBackground(lenis);
-
-  /* ---------- Three: hero ---------- */
-  function tileTexture(label, accent) {
-    const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
-    const r = 36; g.beginPath(); g.moveTo(r, 8); g.arcTo(248, 8, 248, 248, r); g.arcTo(248, 248, 8, 248, r); g.arcTo(8, 248, 8, 8, r); g.arcTo(8, 8, 248, 8, r); g.closePath();
-    const gr = g.createLinearGradient(0, 0, 256, 256); gr.addColorStop(0, '#2d211a'); gr.addColorStop(1, '#17110e'); g.fillStyle = gr; g.fill();
-    g.lineWidth = 3; g.strokeStyle = accent; g.stroke();
-    g.fillStyle = accent; g.fillRect(40, 54, 34, 5);
-    g.fillStyle = '#f4e8d9'; g.font = '700 ' + (label.length > 6 ? 38 : 56) + 'px DM Mono, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label, 128, 134);
-    g.fillStyle = '#8b7768'; g.font = '500 20px DM Mono, monospace'; g.fillText('// stack', 128, 206);
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
-  }
 })();
 
 /* The helpers below are hoisted function declarations at script level so both code paths can use them. */
 function initThree(state) {
   const canvas = document.getElementById('scene'), stage = document.getElementById('stage');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!window.THREE || !canvas) { if (canvas) canvas.style.display = 'none'; return; }
+  if (!window.THREE || !canvas || !stage) { if (canvas) canvas.style.display = 'none'; return; }
   try {
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.7)); renderer.setSize(stage.clientWidth, stage.clientHeight, false); renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -271,7 +311,7 @@ function initThree(state) {
       const a = pg.attributes.position.array; for (let i = 0; i < N; i++) { a[i * 3 + 1] += .0016 * spd[i] * (1 + burst * 6); if (a[i * 3 + 1] > 3.6) a[i * 3 + 1] = -3.6 } pg.attributes.position.needsUpdate = true;
       dust.rotation.y = t * .02;
       camera.position.x = ptr.x * .3; camera.position.y = -ptr.y * .22; camera.lookAt(0, 0, 0); renderer.render(scene, camera);
-      if (++tick % 6 === 0) { rx.textContent = ptr.x.toFixed(2); ry.textContent = ptr.y.toFixed(2) }
+      if (++tick % 6 === 0 && rx && ry) { rx.textContent = ptr.x.toFixed(2); ry.textContent = ptr.y.toFixed(2) }
     })();
   } catch (e) { canvas.style.display = 'none' }
 }
@@ -307,9 +347,151 @@ function initBackground(lenis) {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3));
     const pts = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xff8d55, size: .045, transparent: true, opacity: .7, depthWrite: false })); sc.add(pts);
     const rs = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix() }; addEventListener('resize', rs); rs();
-    let y = 0, vy = 0; lenis.on('scroll', ({ scroll, velocity }) => { y = scroll; vy = velocity });
+    let y = 0, vy = 0; if (lenis) lenis.on('scroll', ({ scroll, velocity }) => { y = scroll; vy = velocity });
     const m = { x: 0, y: 0 }; addEventListener('pointermove', e => { m.x = e.clientX / innerWidth - .5; m.y = e.clientY / innerHeight - .5 }, { passive: true });
     const clock = new THREE.Clock();
     (function loop() { requestAnimationFrame(loop); if (document.hidden) return; const t = clock.getElapsedTime(); pts.rotation.y = t * .012 + m.x * .12 + y * .00018; pts.rotation.x = m.y * .08 + y * .00006; pts.position.y = y * .0016; cam.position.z = 10 - Math.min(3, Math.abs(vy) * .06); r.render(sc, cam) })();
   } catch (e) { cv.style.display = 'none' }
+}
+
+/* arcade game */
+function initArcade() {
+  const canvas = document.getElementById('arcadeCanvas');
+  const welcome = document.getElementById('arcadeWelcome');
+  const hud = document.getElementById('arcadeHud');
+  const gameOver = document.getElementById('arcadeGameOver');
+  const scoreEl = document.getElementById('arcadeScore');
+  const missedEl = document.getElementById('arcadeMissed');
+  const levelEl = document.getElementById('arcadeLevel');
+  const finalScoreEl = document.getElementById('finalScore');
+  const restartBtn = document.getElementById('arcadeRestart');
+
+  if (!canvas || !welcome || !hud || !gameOver) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = 800, H = 500;
+  let gameState = 'welcome';
+  let player = { x: W / 2, w: 60, h: 20, speed: 8 };
+  let bugs = [];
+  let score = 0, missed = 0, level = 1;
+  let keys = {};
+  let bugSpeed = 2;
+  let spawnRate = 80;
+  let frame = 0;
+  let lastFrame = Date.now();
+
+  const bugColors = ['#ff642f', '#ff8d55', '#b6f09c', '#f4e8d9'];
+
+  function reset() {
+    player.x = W / 2;
+    bugs = [];
+    score = 0; missed = 0; level = 1;
+    bugSpeed = 2; spawnRate = 80; frame = 0;
+    updateHud();
+  }
+
+  function updateHud() {
+    if (scoreEl) scoreEl.textContent = score;
+    if (missedEl) missedEl.textContent = missed;
+    if (levelEl) levelEl.textContent = level;
+  }
+
+  function startGame() {
+    gameState = 'playing';
+    reset();
+    welcome.classList.add('hidden');
+    hud.classList.add('visible');
+    gameOver.classList.remove('visible');
+  }
+
+  function endGame() {
+    gameState = 'gameover';
+    hud.classList.remove('visible');
+    gameOver.classList.add('visible');
+    if (finalScoreEl) finalScoreEl.textContent = score;
+  }
+
+  addEventListener('keydown', e => {
+    if (gameState === 'welcome') { startGame(); return }
+    if (gameState === 'gameover') return;
+    keys[e.key] = true;
+  });
+  addEventListener('keyup', e => { keys[e.key] = false });
+
+  if (restartBtn) restartBtn.addEventListener('click', startGame);
+
+  canvas.addEventListener('click', () => { if (gameState === 'welcome') startGame() });
+
+  function update() {
+    if (gameState !== 'playing') return;
+
+    if (keys['ArrowLeft'] && player.x > player.w / 2) player.x -= player.speed;
+    if (keys['ArrowRight'] && player.x < W - player.w / 2) player.x += player.speed;
+
+    frame++;
+    if (frame % spawnRate === 0) {
+      bugs.push({ x: Math.random() * (W - 30) + 15, y: 0, w: 30, h: 30, color: bugColors[Math.floor(Math.random() * bugColors.length)] });
+    }
+
+    bugs = bugs.filter(bug => {
+      bug.y += bugSpeed;
+      if (bug.y + bug.h > H - 40 && bug.y < H - 20 && bug.x + bug.w > player.x - player.w / 2 && bug.x < player.x + player.w / 2) {
+        score += 10;
+        updateHud();
+        if (score > 0 && score % 100 === 0) {
+          level++;
+          bugSpeed += 0.3;
+          spawnRate = Math.max(40, spawnRate - 5);
+          updateHud();
+        }
+        return false;
+      }
+      if (bug.y > H) {
+        missed++;
+        updateHud();
+        if (missed >= 5) { endGame(); return false }
+      }
+      return bug.y <= H;
+    });
+  }
+
+  function draw() {
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f0e0d';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--line').trim() || '#342a23';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < W; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, H); ctx.stroke() }
+    for (let i = 0; i < H; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke() }
+
+    bugs.forEach(bug => {
+      ctx.fillStyle = bug.color;
+      ctx.fillRect(bug.x, bug.y, bug.w, bug.h);
+      ctx.strokeStyle = '#1a100b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(bug.x, bug.y, bug.w, bug.h);
+      ctx.fillStyle = '#1a100b';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('BUG', bug.x + bug.w / 2, bug.y + bug.h / 2 + 4);
+    });
+
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--orange').trim() || '#ff642f';
+    ctx.fillRect(player.x - player.w / 2, H - 30, player.w, player.h);
+    ctx.strokeStyle = '#1a100b';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(player.x - player.w / 2, H - 30, player.w, player.h);
+  }
+
+  function loop() {
+    const now = Date.now();
+    const delta = now - lastFrame;
+    if (delta > 16) {
+      update();
+      draw();
+      lastFrame = now;
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
 }

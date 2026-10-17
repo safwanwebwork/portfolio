@@ -6,10 +6,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0f0e0d">
   <meta name="description" content="Safwan Sumra — Full-stack developer building useful digital products.">
+  <meta property="og:title" content="Safwan Sumra® — Developer & Digital Builder">
+  <meta property="og:description" content="Full-stack developer building useful digital products. PHP, React, Next.js, Laravel.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Safwan Sumra® — Developer & Digital Builder">
+  <meta name="twitter:description" content="Full-stack developer building useful digital products.">
   <title>Safwan Sumra® — Developer & Digital Builder</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/favicon.svg">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>
+    document.documentElement.classList.add('js');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -34,10 +44,13 @@
     <div class="wrap nav">
       <a class="logo" href="#home" data-magnetic>safwan<b id="logoR">®</b></a>
       <nav class="navmid" id="nav">
-        <a href="#home">Index</a><a href="#work">Work</a><a href="#about">About</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
+        <a href="#home">Index</a><a href="#work">Work</a><a href="#about">About</a><a href="#arcade">Arcade</a><a href="#process">Process</a><a href="#contact">Contact</a>
       </nav>
       <div class="navright">
         <span class="availability">OPEN TO OPPORTUNITIES</span>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" data-magnetic>
+          <span class="theme-icon">◐</span>
+        </button>
         <a class="btn hot" href="#contact" data-magnetic><span>Start a project</span><span class="ico">↗</span></a>
         <button class="menu" id="menu" aria-label="Toggle navigation">☰</button>
       </div>
@@ -57,7 +70,7 @@
           <a class="btn hot" href="#work" data-magnetic><span>Explore selected work</span><span class="ico">↘</span></a>
           <a class="btn line" href="#contact" data-magnetic><span>Got a challenge?</span><span class="ico">↗</span></a>
         </div>
-        <div class="micro-links" data-hero="fade"><a href="#about">ABOUT ME ↘</a><a href="#stack">MY TOOLKIT ↘</a><span>PHP / REACT / NEXT.JS</span></div>
+        <div class="micro-links" data-hero="fade"><a href="#about">ABOUT ME ↘</a><a href="#arcade">TRY THE ARCADE ↘</a><span>PHP / REACT / NEXT.JS</span></div>
       </div>
 
       <div class="hero-stage" id="stage" data-hero="stage">
@@ -88,10 +101,11 @@
       <div class="stat"><b><span data-count="100">100</span><em>%</em></b><span>Focused on Quality</span></div>
     </div>
 
-    <section class="wrap section" id="work">
+    <section class="wrap section work-chapter" id="work">
       <div class="section-head" data-rv>
         <div>
-          <div class="eyebrow">01 — Selected work</div>
+          <div class="chapter-num">02</div>
+          <div class="eyebrow">The Work</div>
           <h2>Shipped to solve<br>something real.</h2>
           <p>Different industries. Different constraints. The same goal: build something useful.</p>
         </div>
@@ -101,12 +115,12 @@
         <button class="filter-btn active" data-filter="all">ALL WORK <span>06</span></button>
         <button class="filter-btn" data-filter="ecommerce">ECOMMERCE</button>
         <button class="filter-btn" data-filter="business">BUSINESS</button>
-        <button class="filter-btn" data-filter="erp-lead">ERP &amp; LEAD MANAGEMENT</button>
+        <button class="filter-btn" data-filter="erp-lead">ERP &amp; LEAD</button>
         <button class="filter-btn" data-filter="saas">SAAS</button>
       </div>
 
       <div class="project-grid" id="projectGrid">
-        <a class="project" data-category="ecommerce" href="https://preeco.in/" target="_blank" rel="noreferrer">
+        <a class="project project-large" data-category="ecommerce" href="https://preeco.in/" target="_blank" rel="noreferrer">
           <div class="preview">
             <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">preeco.in</span></div>
               <div class="browser-screen"><img src="assets/projects/preeco.png" alt="PRECO engineering and e-commerce platform preview" class="browser-img" loading="lazy" onerror="this.style.display='none'"></div></div>
@@ -118,7 +132,7 @@
             <div class="chips"><span>Next.js</span><span>ECOMMERCE</span><span>CATALOG</span></div>
           </div>
         </a>
-        <a class="project" data-category="ecommerce" href="https://arihantgifts.in/" target="_blank" rel="noreferrer">
+        <a class="project project-large" data-category="ecommerce" href="https://arihantgifts.in/" target="_blank" rel="noreferrer">
           <div class="preview">
             <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">arihantgifts.in</span></div>
               <div class="browser-screen"><img src="assets/projects/arihant.png" alt="Arihant Gifts corporate gifting platform preview" class="browser-img" loading="lazy" onerror="this.style.display='none'"></div></div>
@@ -182,7 +196,7 @@
       <div class="project-note">↳ HOVER TO TILT · CLICK A CARD TO VISIT THE LIVE WEBSITE.</div>
     </section>
 
-    <section class="wrap section" id="about" style="padding-top:20px">
+    <section class="wrap section about-chapter" id="about">
       <div class="about">
         <div class="about-art" data-rv>
           <canvas id="aboutCanvas"></canvas>
@@ -190,7 +204,8 @@
           <div class="art-coord"><span>CREATIVE ENGINEERING</span><span>19°04' N / MUMBAI</span></div>
         </div>
         <div class="about-text" data-rv>
-          <div class="eyebrow">02 — The person behind the commits</div>
+          <div class="chapter-num">03</div>
+          <div class="eyebrow">Behind the Code</div>
           <h2>Curiosity in.<br>Useful things out.</h2>
           <p>I'm a full-stack developer working across PHP, CodeIgniter, Laravel, React and Next.js. I've contributed to business websites, e-commerce, school ERP workflows and custom web tools.</p>
           <p>I care about understanding the actual problem, connecting the moving parts and making the result useful—not just making pixels look good.</p>
@@ -200,24 +215,55 @@
           <div class="stack-title"><strong>THE TOOLKIT</strong><span>MY DAILY BUILDING BLOCKS ↘</span></div>
           <p class="stack-intro">A few of the tools I use to turn ideas into working products. Hover around and explore.</p>
           <div class="stack-grid">
-            <div class="stack-item"><span class="stack-tag">UI</span><div class="stack-icon"><i class="devicon-react-original colored" aria-hidden="true"></i></div><span>React</span></div>
-            <div class="stack-item"><span class="stack-tag">WEB</span><div class="stack-icon"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#f4e8d9" /><path d="M12 27V13l17 18" fill="none" stroke="#171311" stroke-width="2.6" /><path d="M28 13v14" fill="none" stroke="#171311" stroke-width="2.6" /></svg></div><span>Next.js</span></div>
-            <div class="stack-item"><span class="stack-tag">BACKEND</span><div class="stack-icon"><i class="devicon-php-plain colored" aria-hidden="true"></i></div><span>PHP</span></div>
-            <div class="stack-item"><span class="stack-tag">MVC</span><div class="stack-icon"><i class="devicon-codeigniter-plain colored" aria-hidden="true"></i></div><span>CodeIgniter</span></div>
-            <div class="stack-item"><span class="stack-tag">MVC</span><div class="stack-icon"><i class="devicon-laravel-original colored" aria-hidden="true"></i></div><span>Laravel</span></div>
-            <div class="stack-item"><span class="stack-tag">DATA</span><div class="stack-icon"><i class="devicon-mysql-original colored" aria-hidden="true"></i></div><span>MySQL</span></div>
-            <div class="stack-item"><span class="stack-tag">MOBILE</span><div class="stack-icon"><i class="devicon-react-original colored" aria-hidden="true"></i></div><span>React Native</span></div>
-            <div class="stack-item"><span class="stack-tag">INTEGRATE</span><div class="stack-icon"><svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13L16 3Z" stroke="#ff8755" stroke-width="1.7" /><path d="m10 12 6-3 6 3v8l-6 3-6-3v-8Z" stroke="#f4e8d9" stroke-width="1.5" /><path d="M4 9.5 16 16l12-6.5M16 16v13" stroke="#ff8755" stroke-width="1.5" /></svg></div><span>REST APIs</span></div>
-            <div class="stack-item"><span class="stack-tag">VERSION</span><div class="stack-icon"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M18 3.7a2.8 2.8 0 0 1 4 0l14.3 14.3a2.8 2.8 0 0 1 0 4L22 36.3a2.8 2.8 0 0 1-4 0L3.7 22a2.8 2.8 0 0 1 0-4Z" fill="#f05b3c" /><path d="m12.5 12.5 15 15M12.5 20h7.2v-7.5M20 20l7.5-7.5" fill="none" stroke="#fff3e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12.5" cy="12.5" r="2.1" fill="#fff3e8" /><circle cx="27.5" cy="12.5" r="2.1" fill="#fff3e8" /><circle cx="27.5" cy="27.5" r="2.1" fill="#fff3e8" /></svg></div><span>Git</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">UI</span><div class="stack-icon"><i class="devicon-react-original colored" aria-hidden="true"></i></div><span>React</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">WEB</span><div class="stack-icon"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--cream)" /><path d="M12 27V13l17 18" fill="none" stroke="var(--bg)" stroke-width="2.6" /><path d="M28 13v14" fill="none" stroke="var(--bg)" stroke-width="2.6" /></svg></div><span>Next.js</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">BACKEND</span><div class="stack-icon"><i class="devicon-php-plain colored" aria-hidden="true"></i></div><span>PHP</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">MVC</span><div class="stack-icon"><i class="devicon-codeigniter-plain colored" aria-hidden="true"></i></div><span>CodeIgniter</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">MVC</span><div class="stack-icon"><i class="devicon-laravel-original colored" aria-hidden="true"></i></div><span>Laravel</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">DATA</span><div class="stack-icon"><i class="devicon-mysql-original colored" aria-hidden="true"></i></div><span>MySQL</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">MOBILE</span><div class="stack-icon"><i class="devicon-react-original colored" aria-hidden="true"></i></div><span>React Native</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">INTEGRATE</span><div class="stack-icon"><svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13L16 3Z" stroke="var(--orange)" stroke-width="1.7" /><path d="m10 12 6-3 6 3v8l-6 3-6-3v-8Z" stroke="var(--cream)" stroke-width="1.5" /><path d="M4 9.5 16 16l12-6.5M16 16v13" stroke="var(--orange)" stroke-width="1.5" /></svg></div><span>REST APIs</span></div>
+            <div class="stack-item" data-draggable><span class="stack-tag">VERSION</span><div class="stack-icon"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M18 3.7a2.8 2.8 0 0 1 4 0l14.3 14.3a2.8 2.8 0 0 1 0 4L22 36.3a2.8 2.8 0 0 1-4 0L3.7 22a2.8 2.8 0 0 1 0-4Z" fill="#f05b3c" /><path d="m12.5 12.5 15 15M12.5 20h7.2v-7.5M20 20l7.5-7.5" fill="none" stroke="#fff3e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12.5" cy="12.5" r="2.1" fill="#fff3e8" /><circle cx="27.5" cy="12.5" r="2.1" fill="#fff3e8" /><circle cx="27.5" cy="27.5" r="2.1" fill="#fff3e8" /></svg></div><span>Git</span></div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="wrap section" style="padding-top:8px">
+    <section class="wrap section arcade-chapter" id="arcade">
+      <div class="arcade-wrapper" data-rv>
+        <div class="chapter-num">04</div>
+        <div class="eyebrow">Developer Arcade</div>
+        <h2>Take a break.<br>Catch some bugs.</h2>
+        <p class="arcade-intro">Quick keyboard reaction challenge. Click to start, catch the bugs before they escape!</p>
+        <div class="arcade-container" id="arcadeContainer">
+          <div class="arcade-welcome" id="arcadeWelcome">
+            <div class="arcade-title">BUG CATCHER</div>
+            <div class="arcade-subtitle">PRESS ANY KEY TO START</div>
+            <div class="arcade-info">
+              <p>Use <kbd>←</kbd> <kbd>→</kbd> arrow keys to move</p>
+              <p>Catch falling bugs · Miss 5 and it's game over</p>
+            </div>
+          </div>
+          <canvas id="arcadeCanvas" width="800" height="500"></canvas>
+          <div class="arcade-hud" id="arcadeHud">
+            <div class="hud-item">SCORE <b id="arcadeScore">0</b></div>
+            <div class="hud-item">MISSED <b id="arcadeMissed">0</b> / 5</div>
+            <div class="hud-item">LEVEL <b id="arcadeLevel">1</b></div>
+          </div>
+          <div class="arcade-gameover" id="arcadeGameOver">
+            <div class="gameover-title">GAME OVER</div>
+            <div class="gameover-score">Final Score: <b id="finalScore">0</b></div>
+            <button class="btn hot" id="arcadeRestart" data-magnetic><span>Play Again</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section process-chapter" id="process">
       <div class="process" data-rv>
         <div>
-          <div class="eyebrow">03 — How I approach a build</div>
+          <div class="chapter-num">05</div>
+          <div class="eyebrow">How I Build</div>
           <h2>Think it through.<br>Ship it thoughtfully.</h2>
         </div>
         <div class="steps">
@@ -233,7 +279,8 @@
     <section class="wrap contact" id="contact">
       <div class="contact-panel" data-rv>
         <div>
-          <div class="eyebrow">04 — Your turn</div>
+          <div class="chapter-num">06</div>
+          <div class="eyebrow">Let's Build Something</div>
           <h2>Got a problem<br>worth solving?</h2>
           <p>Tell me what you're trying to build. Let's figure out the useful, sensible way to make it happen.</p>
           <div class="actions">
@@ -258,6 +305,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Draggable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="assets/js/main.js"></script>
